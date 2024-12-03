@@ -1,0 +1,131 @@
+# Load the newly uploaded control image
+control_image_path = "/mnt/data/5142F66E-FA7E-42B8-812B-F6CE390FD551.jpeg"
+control_image_full = cv2.imread(control_image_path, cv2.IMREAD_GRAYSCALE)
+
+# Count cells in the new control image
+new_control_count = count_cells(control_image_full)
+new_control_count
+# Load the newly uploaded 50 nM image
+fifty_nm_image_path = "/mnt/data/C3954ADF-4F6D-442A-8F21-F95F8EA8BB12.jpeg"
+fifty_nm_image_full = cv2.imread(fifty_nm_image_path, cv2.IMREAD_GRAYSCALE)
+
+# Count cells in the new 50 nM image
+new_fifty_nm_count = count_cells(fifty_nm_image_full)
+new_fifty_nm_count
+import cv2
+import numpy as np
+
+# Load the image using OpenCV for processing
+image_100nm_cv = cv2.imread(image_path_100nm_updated, cv2.IMREAD_GRAYSCALE)
+
+# Preprocess the image: apply a GaussianBlur and binary threshold for clearer segmentation
+blurred_100nm = cv2.GaussianBlur(image_100nm_cv, (5, 5), 0)
+_, binary_100nm = cv2.threshold(blurred_100nm, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+# Find contours of the cells
+contours_100nm, _ = cv2.findContours(binary_100nm, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+# Count the number of contours as an estimate of cell count
+cell_count_100nm = len(contours_100nm)
+cell_count_100nm
+import pandas as pd
+
+# Creating a dataframe for the provided data
+data = {
+    "Group": ["Control A", "Control B", "10A", "10B", "100A", "100B"],
+    "Viable": [75, 7, 3, 0, 4, 4],
+    "Unviable": [5, 81, 146, 101, 91, 12],
+}
+
+df = pd.DataFrame(data)
+
+# Calculating the ratio of viable to unviable for each group
+df["Viable_to_Unviable_Ratio"] = df["Viable"] / df["Unviable"]
+df
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Data from the table
+groups = ["Control A", "Control B", "10A", "10B", "100A", "100B"]
+viable = np.array([75, 7, 3, 0, 4, 4])
+unviable = np.array([5, 81, 146, 101, 91, 12])
+ratios = viable / unviable
+
+# Bar plot for Viable and Unviable counts
+x = np.arange(len(groups))
+width = 0.35
+
+fig, ax1 = plt.subplots(figsize=(10, 6))
+
+# Bar chart for viable and unviable counts
+bars1 = ax1.bar(x - width/2, viable, width, label="Viable", color="green")
+bars2 = ax1.bar(x + width/2, unviable, width, label="Unviable", color="red")
+
+# Line plot for Viable-to-Unviable Ratios
+ax2 = ax1.twinx()
+line = ax2.plot(x, ratios, label="Viable/Unviable Ratio", color="blue", marker="o", linewidth=2)
+
+# Labeling
+ax1.set_xlabel("Groups")
+ax1.set_ylabel("Cell Counts", color="black")
+ax2.set_ylabel("Viable-to-Unviable Ratio", color="blue")
+ax1.set_title("Viable and Unviable Cell Counts with Ratios")
+ax1.set_xticks(x)
+ax1.set_xticklabels(groups)
+ax1.legend(loc="upper left")
+ax2.legend(loc="upper right")
+
+# Display the graph
+plt.tight_layout()
+plt.show()
+# Define Wortmannin concentrations for each group
+concentrations = [0, 0, 10, 10, 100, 100]
+
+# Perform correlation analysis between Wortmannin concentrations and unviable counts (cell death)
+correlation, p_value = stats.pearsonr(concentrations, df["Unviable"])
+
+correlation, p_value
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Create a DataFrame with the data
+data = {
+    "Group": ["Control A", "Control B", "10A", "10B", "100A", "100B"],
+    "Viable": [75, 7, 3, 0, 4, 4],
+    "Unviable": [5, 81, 146, 101, 91, 12]
+}
+
+df = pd.DataFrame(data)
+
+# Calculate totals and percentages for each group
+df["Total"] = df["Viable"] + df["Unviable"]
+df["Viable %"] = (df["Viable"] / df["Total"]) * 100
+df["Unviable %"] = (df["Unviable"] / df["Total"]) * 100
+
+# Plotting a bar graph
+fig, ax = plt.subplots(figsize=(10, 6))
+bar_width = 0.35
+x = range(len(df["Group"]))
+
+# Bar positions
+viable_bars = [i - bar_width / 2 for i in x]
+unviable_bars = [i + bar_width / 2 for i in x]
+
+# Plotting bars
+ax.bar(viable_bars, df["Viable"], bar_width, label="Viable", color="green")
+ax.bar(unviable_bars, df["Unviable"], bar_width, label="Unviable", color="red")
+
+# Adding labels and title
+ax.set_xlabel("Group", fontsize=12)
+ax.set_ylabel("Count", fontsize=12)
+ax.set_title("Viable vs Unviable by Group", fontsize=14)
+ax.set_xticks(x)
+ax.set_xticklabels(df["Group"], fontsize=10)
+ax.legend(fontsize=10)
+
+# Show plot
+plt.tight_layout()
+plt.show()
+
+# Summary of statistics
+df.describe()
